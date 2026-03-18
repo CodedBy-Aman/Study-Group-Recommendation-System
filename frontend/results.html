@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StudyMatch — Results</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f6f2;
+      --text: #1a1a1a;
+      --muted: #888;
+      --accent: #2563eb;
+      --border: #e0ddd6;
+      --card: #fff;
+      --green: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 400;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em; text-decoration: none; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted); text-decoration: none; }
+    .nav-back:hover { color: var(--text); }
+
+    .page { max-width: 700px; margin: 0 auto; padding: 60px 24px 80px; }
+
+    .page-header { margin-bottom: 36px; }
+    .page-header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .page-header p { font-size: 0.95rem; color: var(--muted); }
+
+    /* TRIGGER MATCH */
+    .match-trigger {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .match-trigger p { font-size: 0.92rem; color: var(--muted); }
+    .btn-run {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 500;
+      font-size: 0.92rem;
+      padding: 10px 24px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+    .btn-run:hover { opacity: 0.88; }
+    .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* LOADING */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      letter-spacing: 0.06em;
+    }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* RESULTS LIST */
+    #results-list { display: none; }
+
+    .result-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+    .result-card:hover { border-color: #c0bdb6; }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .result-name { font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em; }
+    .result-email { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+    .score-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      background: rgba(37,99,235,0.08);
+      border: 1px solid rgba(37,99,235,0.2);
+      color: var(--accent);
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    /* SKILL BARS */
+    .skills { display: flex; flex-direction: column; gap: 10px; }
+    .skill-row { display: flex; align-items: center; gap: 12px; }
+    .skill-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      width: 48px;
+      flex-shrink: 0;
+    }
+    .skill-bar-bg {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .skill-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--accent);
+      transition: width 0.6s ease;
+    }
+    .skill-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      width: 16px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* EMPTY STATE */
+    .empty {
+      display: none;
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 16px 20px; }
+      .match-trigger { flex-direction: column; align-items: flex-start; }
+      .result-card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Study<span>Match</span></a>
+  <a href="register.html" class="nav-back">← Register</a>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Your matches</h1>
+    <p>Students whose skills best complement yours, ranked by score.</p>
+  </div>
+
+  <!-- Trigger -->
+  <div class="match-trigger">
+    <p>Click to run the Gale-Shapley algorithm and fetch your matched study partners.</p>
+    <button class="btn-run" id="run-btn" onclick="runMatch()">Run Matching →</button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    running algorithm...
+  </div>
+
+  <!-- Results -->
+  <div id="results-list"></div>
+
+  <!-- Empty -->
+  <div class="empty" id="empty">No matches found. Make sure students are registered first.</div>
+</div>
+
+<script>
+  const SUBJECTS = ['dsa', 'oop', 'dbms', 'os', 'maths'];
+
+  async function runMatch() {
+    const btn = document.getElementById('run-btn');
+    const loading = document.getElementById('loading');
+    const list = document.getElementById('results-list');
+    const empty = document.getElementById('empty');
+
+    btn.disabled = true;
+    btn.textContent = 'Running...';
+    loading.style.display = 'block';
+    list.style.display = 'none';
+    empty.style.display = 'none';
+
+    try {
+      const res = await fetch('/api/match', { method: 'POST' });
+      const data = await res.json();
+      renderResults(data.matches || []);
+    } catch {
+      // demo fallback when backend is not running
+      renderResults(getDemoData());
+    } finally {
+      loading.style.display = 'none';
+      btn.disabled = false;
+      btn.textContent = 'Re-run Matching →';
+    }
+  }
+
+  function renderResults(matches) {
+    const list = document.getElementById('results-list');
+    const empty = document.getElementById('empty');
+
+    if (!matches.length) {
+      empty.style.display = 'block';
+      return;
+    }
+
+    list.innerHTML = matches.map(m => `
+      <div class="result-card">
+        <div class="result-header">
+          <div>
+            <div class="result-name">${m.name}</div>
+            <div class="result-email">${m.email}</div>
+          </div>
+          <div class="score-badge">Score: ${m.score.toFixed(2)}</div>
+        </div>
+        <div class="skills">
+          ${SUBJECTS.map(s => `
+            <div class="skill-row">
+              <span class="skill-name">${s.toUpperCase()}</span>
+              <div class="skill-bar-bg">
+                <div class="skill-bar-fill" style="width:${(m.skills[s] / 10) * 100}%"></div>
+              </div>
+              <span class="skill-val">${m.skills[s]}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+
+    list.style.display = 'block';
+  }
+
+  function getDemoData() {
+    return [
+      { name: 'Amanpreet Singh', email: 'aman@example.com', score: 8.4,
+        skills: { dsa: 9, oop: 7, dbms: 5, os: 8, maths: 6 } },
+      { name: 'Mohit Kumar',     email: 'mohit@example.com', score: 7.1,
+        skills: { dsa: 5, oop: 8, dbms: 9, os: 6, maths: 7 } },
+      { name: 'Priya Sharma',    email: 'priya@example.com', score: 6.3,
+        skills: { dsa: 6, oop: 5, dbms: 7, os: 9, maths: 8 } },
+    ];
+  }
+</script>
+
+</body>
+</html>
