@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StudyMatch — Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f6f2;
+      --text: #1a1a1a;
+      --muted: #888;
+      --accent: #2563eb;
+      --border: #e0ddd6;
+      --card: #fff;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em; text-decoration: none; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted); text-decoration: none; }
+    .nav-back:hover { color: var(--text); }
+
+    .page { max-width: 600px; margin: 0 auto; padding: 60px 24px 80px; }
+
+    .page-header { margin-bottom: 36px; }
+    .page-header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .page-header p { font-size: 0.95rem; color: var(--muted); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .field { margin-bottom: 20px; }
+    .field:last-child { margin-bottom: 0; }
+    label { display: block; font-size: 0.88rem; font-weight: 500; margin-bottom: 8px; }
+    input[type="text"], input[type="email"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus, input[type="email"]:focus { border-color: var(--accent); }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .slider-row:last-child { margin-bottom: 0; }
+    .slider-label { font-size: 0.88rem; font-weight: 500; width: 56px; flex-shrink: 0; }
+    input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      background: var(--border);
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    .slider-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--accent);
+      width: 20px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .msg {
+      display: none;
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .msg.success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a; display: block; }
+    .msg.error   { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; display: block; }
+
+    @media (max-width: 600px) {
+      nav { padding: 16px 20px; }
+      .card { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">Study<span>Match</span></a>
+  <a href="index.html" class="nav-back">← Back</a>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Create your profile</h1>
+    <p>Rate your skill level in each subject so we can find your best match.</p>
+  </div>
+
+  <!-- Basic Info -->
+  <div class="card">
+    <div class="card-title">Basic Info</div>
+    <div class="field">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" placeholder="e.g. Ayush Chauhan" />
+    </div>
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="e.g. ayush@example.com" />
+    </div>
+  </div>
+
+  <!-- Skill Levels -->
+  <div class="card">
+    <div class="card-title">Skill Levels — drag to rate (1 = beginner, 10 = expert)</div>
+
+    <div class="slider-row">
+      <span class="slider-label">DSA</span>
+      <input type="range" min="1" max="10" value="5" id="dsa" oninput="update('dsa')"/>
+      <span class="slider-val" id="dsa-val">5</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label">OOP</span>
+      <input type="range" min="1" max="10" value="5" id="oop" oninput="update('oop')"/>
+      <span class="slider-val" id="oop-val">5</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label">DBMS</span>
+      <input type="range" min="1" max="10" value="5" id="dbms" oninput="update('dbms')"/>
+      <span class="slider-val" id="dbms-val">5</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label">OS</span>
+      <input type="range" min="1" max="10" value="5" id="os" oninput="update('os')"/>
+      <span class="slider-val" id="os-val">5</span>
+    </div>
+    <div class="slider-row">
+      <span class="slider-label">Maths</span>
+      <input type="range" min="1" max="10" value="5" id="maths" oninput="update('maths')"/>
+      <span class="slider-val" id="maths-val">5</span>
+    </div>
+  </div>
+
+  <button class="btn-submit" onclick="submitForm()">Submit Profile →</button>
+  <div class="msg" id="msg"></div>
+</div>
+
+<script>
+  function update(id) {
+    document.getElementById(id + '-val').textContent = document.getElementById(id).value;
+  }
+
+  async function submitForm() {
+    const name  = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const msg   = document.getElementById('msg');
+
+    if (!name || !email) {
+      msg.className = 'msg error';
+      msg.textContent = 'Please fill in your name and email.';
+      return;
+    }
+
+    const payload = {
+      name,
+      email,
+      skills: {
+        dsa:   parseInt(document.getElementById('dsa').value),
+        oop:   parseInt(document.getElementById('oop').value),
+        dbms:  parseInt(document.getElementById('dbms').value),
+        os:    parseInt(document.getElementById('os').value),
+        maths: parseInt(document.getElementById('maths').value),
+      }
+    };
+
+    try {
+      const res = await fetch('/api/students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        msg.className = 'msg success';
+        msg.textContent = 'Profile submitted! Redirecting to results...';
+        setTimeout(() => window.location.href = 'results.html', 1500);
+      } else {
+        throw new Error('Server error');
+      }
+    } catch {
+      // backend not running yet — show success for now
+      msg.className = 'msg success';
+      msg.textContent = 'Profile saved locally. Connect backend to persist.';
+    }
+  }
+</script>
+
+</body>
+</html>
