@@ -36,7 +36,7 @@ A 0.9-expert paired with a 0.1-beginner scores much higher than two 0.5-mediocre
 study-group-recommender/
 ├── algorithm/
 │   ├── matcher.hpp          ← Student, MatchResult structs + GaleShapley class (Amanpreet)
-│   ├── matcher.cpp          ← Gale-Shapley loop, preferences, scoring (Amanpreet + Mohit)
+│   ├── matcher.cpp          ← Gale-Shapley loop, preferences, scoring (Amanpreet)
 │   ├── bid_calculator.hpp   ← BidCalculator class declaration (Ayush)
 │   ├── bid_calculator.cpp   ← Complementarity scoring formula (Ayush)
 │   ├── bindings.cpp         ← pybind11 bridge: C++ → Python (Amanpreet)
