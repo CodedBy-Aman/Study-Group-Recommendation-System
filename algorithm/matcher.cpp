@@ -40,3 +40,39 @@ GaleShapley::compute_all_scores() {
     }
     return scores;
 }
+
+// har student ke liye ek sorted preference list banata hai
+// jis student ke saath sabse zyada compatible hoga
+// woh list mein pehle hoga
+// yahi list decide karti hai ki pehle kisko propose karna hai
+
+std::unordered_map<std::string, std::vector<std::string>>
+GaleShapley::build_preferences() {
+    auto scores = compute_all_scores();
+
+    // helper lambda — kisi bhi do students ka score nikalo
+    // key order matter nahi karta yahan
+    auto get_score = [&](const std::string& a, const std::string& b) -> double {
+        std::string key = (a < b) ? (a + ":" + b) : (b + ":" + a);
+        auto it = scores.find(key);
+        return (it != scores.end()) ? it->second : 0.0;
+    };
+
+    std::unordered_map<std::string, std::vector<std::string>> prefs;
+
+    for (const auto& s : students_) {
+        // is student ke alawa baaki sab collect karo
+        std::vector<std::string> others;
+        for (const auto& other : students_)
+            if (other.id != s.id) others.push_back(other.id);
+
+        // compatibility ke hisaab se sort karo — highest pehle
+        std::sort(others.begin(), others.end(),
+            [&](const std::string& x, const std::string& y) {
+                return get_score(s.id, x) > get_score(s.id, y);
+            });
+
+        prefs[s.id] = others;
+    }
+    return prefs;
+}
