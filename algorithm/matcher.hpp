@@ -97,6 +97,5 @@ private:
     std::unordered_map<std::string, std::vector<std::string>> build_preferences();
 
     // sabke beech pairwise compatibility calculate karta hai
-    // Mohit ne ye function implement kiya hai matcher.cpp mein
     std::unordered_map<std::string, double> compute_all_scores();
 };
