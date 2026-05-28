@@ -3,30 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>StudyMatch — Results</title>
+  <title>StudyMatch — Compatibility Matches</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #f7f6f2;
-      --text: #1a1a1a;
-      --muted: #888;
-      --accent: #2563eb;
-      --border: #e0ddd6;
-      --card: #fff;
-      --green: #16a34a;
-      --green-bg: #f0fdf4;
-      --green-border: #bbf7d0;
+      --bg: #09090e;
+      --text: #f4f4f7;
+      --muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-purple: #8b5cf6;
+      --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.16);
+      --card: rgba(22, 22, 33, 0.45);
+      --glass-bg: rgba(15, 15, 25, 0.7);
+      --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --green: #10b981;
+      --orange: #f59e0b;
     }
 
     body {
-      background: var(--bg);
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+      background-attachment: fixed;
       color: var(--text);
       font-family: 'Outfit', sans-serif;
       font-weight: 400;
       line-height: 1.6;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
     nav {
@@ -35,146 +44,349 @@
       align-items: center;
       padding: 20px 40px;
       border-bottom: 1px solid var(--border);
+      background: rgba(9, 9, 14, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .logo { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em; text-decoration: none; color: var(--text); }
-    .logo span { color: var(--accent); }
-    .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted); text-decoration: none; }
-    .nav-back:hover { color: var(--text); }
+    .logo { font-weight: 700; font-size: 1.3rem; letter-spacing: -0.02em; text-decoration: none; color: var(--text); }
+    .logo span { background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .nav-back:hover { color: #fff; }
 
-    .page { max-width: 700px; margin: 0 auto; padding: 60px 24px 80px; }
+    .page { max-width: 800px; margin: 0 auto; padding: 60px 24px 80px; position: relative; }
 
     .page-header { margin-bottom: 36px; }
-    .page-header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .page-header h1 { 
+      font-size: 2rem; 
+      font-weight: 700; 
+      letter-spacing: -0.02em; 
+      margin-bottom: 8px; 
+      background: linear-gradient(to right, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
     .page-header p { font-size: 0.95rem; color: var(--muted); }
 
-    /* TRIGGER MATCH */
-    .match-trigger {
-      background: var(--card);
+    /* DASHBOARD LAYOUT */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+      display: none; /* Controlled by loader script */
+    }
+
+    /* USER PROFILE SUMMARY CARD */
+    .profile-summary-card {
+      background: linear-gradient(135deg, rgba(22, 22, 33, 0.6) 0%, rgba(15, 15, 25, 0.6) 100%);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 16px;
+      padding: 28px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 30px rgba(59, 130, 246, 0.05);
+    }
+    .summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+    .summary-user-info h3 { font-size: 1.2rem; font-weight: 600; color: #fff; }
+    .summary-user-info p { font-size: 0.85rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+    .summary-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+    .skills-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .skill-summary-box {
+      background: rgba(9, 9, 14, 0.4);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 28px 32px;
-      margin-bottom: 28px;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .skill-summary-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .skill-summary-val {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .avail-slots-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .avail-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-right: 8px;
+    }
+    .avail-chip-mini {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: #cbd5e1;
+    }
+
+    /* MATCH LIST SECTION */
+    .matches-section h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #fff;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 16px;
+      gap: 10px;
     }
-    .match-trigger p { font-size: 0.92rem; color: var(--muted); }
-    .btn-run {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 500;
-      font-size: 0.92rem;
-      padding: 10px 24px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: opacity 0.2s;
-      flex-shrink: 0;
+    .matches-section h2::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
     }
-    .btn-run:hover { opacity: 0.88; }
-    .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* LOADING */
-    .loading {
-      display: none;
-      text-align: center;
-      padding: 60px 24px;
-      color: var(--muted);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem;
-      letter-spacing: 0.06em;
-    }
-    .spinner {
-      width: 32px; height: 32px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      margin: 0 auto 16px;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* RESULTS LIST */
-    #results-list { display: none; }
-
+    /* RESULT CARD */
     .result-card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 28px 32px;
-      margin-bottom: 16px;
-      transition: border-color 0.2s;
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+      position: relative;
     }
-    .result-card:hover { border-color: #c0bdb6; }
+    .result-card:hover { 
+      border-color: rgba(139, 92, 246, 0.25);
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.06);
+      transform: translateY(-2px);
+    }
 
     .result-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 20px;
+      gap: 16px;
     }
-    .result-name { font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em; }
-    .result-email { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+    .result-student-info h3 { font-size: 1.15rem; font-weight: 600; color: #fff; }
+    .result-student-info p { font-size: 0.82rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+    
+    .score-circle-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .match-meta-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #f59e0b;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      padding: 4px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
     .score-badge {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
-      font-weight: 500;
-      padding: 6px 14px;
-      background: rgba(37,99,235,0.08);
-      border: 1px solid rgba(37,99,235,0.2);
-      color: var(--accent);
-      border-radius: 20px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      color: #93c5fd;
+      border-radius: 30px;
       white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+    }
+
+    /* REASON BADGE */
+    .reason-box {
+      background: rgba(255, 255, 255, 0.02);
+      border-left: 3px solid var(--accent-purple);
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      margin-bottom: 20px;
+      font-style: italic;
     }
 
     /* SKILL BARS */
-    .skills { display: flex; flex-direction: column; gap: 10px; }
-    .skill-row { display: flex; align-items: center; gap: 12px; }
+    .skills { display: flex; flex-direction: column; gap: 12px; }
+    .skill-row { display: flex; align-items: center; gap: 14px; }
     .skill-name {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.72rem;
       color: var(--muted);
-      width: 48px;
+      width: 50px;
       flex-shrink: 0;
+      text-transform: uppercase;
     }
     .skill-bar-bg {
       flex: 1;
       height: 6px;
-      background: var(--border);
+      background: rgba(255, 255, 255, 0.05);
       border-radius: 4px;
       overflow: hidden;
+      position: relative;
     }
     .skill-bar-fill {
       height: 100%;
       border-radius: 4px;
-      background: var(--accent);
-      transition: width 0.6s ease;
+      background: var(--accent-gradient);
+      width: 0; /* Animated on load */
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .skill-val {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem;
-      color: var(--muted);
-      width: 16px;
+      font-size: 0.75rem;
+      color: var(--text);
+      width: 18px;
       text-align: right;
       flex-shrink: 0;
+      font-weight: 500;
     }
 
-    /* EMPTY STATE */
-    .empty {
-      display: none;
+    /* EMPTY STATE & WARNING */
+    .warning-card {
+      background: rgba(245, 158, 11, 0.05);
+      border: 1px solid rgba(245, 158, 11, 0.15);
+      border-radius: 16px;
+      padding: 40px 32px;
       text-align: center;
-      padding: 60px 24px;
-      color: var(--muted);
-      font-size: 0.95rem;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+    }
+    .warning-card h2 { font-size: 1.4rem; color: #fff; margin-bottom: 12px; }
+    .warning-card p { color: var(--muted); margin-bottom: 28px; font-size: 0.95rem; }
+    .btn-action {
+      display: inline-block;
+      padding: 12px 28px;
+      background: var(--accent-gradient);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+      transition: all 0.3s;
+    }
+    .btn-action:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+    }
+
+    /* SIMULATED ENGINE LOADING SCREEN */
+    .engine-loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px;
+      text-align: center;
+    }
+    .radar-container {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin-bottom: 36px;
+    }
+    .radar-circle {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      border: 2px solid rgba(59, 130, 246, 0.15);
+      border-radius: 50%;
+    }
+    .radar-circle:nth-child(2) {
+      width: 70%; height: 70%;
+      top: 15%; left: 15%;
+      border-color: rgba(139, 92, 246, 0.2);
+    }
+    .radar-circle:nth-child(3) {
+      width: 40%; height: 40%;
+      top: 30%; left: 30%;
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+    .radar-sweep {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: conic-gradient(from 0deg, rgba(59, 130, 246, 0.4) 0deg, transparent 90deg, transparent 360deg);
+      border-radius: 50%;
+      animation: rotate-sweep 1.8s linear infinite;
+    }
+    .radar-dot {
+      position: absolute;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 10px #3b82f6, 0 0 20px #3b82f6;
+      top: 25%; left: 75%;
+      animation: blink-dot 1.2s ease infinite;
+    }
+    .radar-dot:nth-child(6) {
+      top: 65%; left: 20%;
+      background: #8b5cf6;
+      box-shadow: 0 0 10px #8b5cf6;
+      animation-delay: 0.4s;
+    }
+    @keyframes rotate-sweep {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes blink-dot {
+      0%, 100% { opacity: 0.2; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .loader-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+    .loader-subtitle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent-purple);
+      min-height: 24px;
     }
 
     @media (max-width: 600px) {
       nav { padding: 16px 20px; }
-      .match-trigger { flex-direction: column; align-items: flex-start; }
       .result-card { padding: 20px; }
+      .skills-summary-grid { grid-template-columns: repeat(3, 1fr); }
+      .result-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .score-circle-wrapper { width: 100%; justify-content: space-between; }
     }
   </style>
 </head>
@@ -182,107 +394,320 @@
 
 <nav>
   <a href="index.html" class="logo">Study<span>Match</span></a>
-  <a href="register.html" class="nav-back">← Register</a>
+  <a href="register.html" class="nav-back">← Profile</a>
 </nav>
 
 <div class="page">
-  <div class="page-header">
-    <h1>Your matches</h1>
-    <p>Students whose skills best complement yours, ranked by score.</p>
+  <div id="unregistered-warning" style="display:none;">
+    <div class="warning-card">
+      <h2>No Profile Found</h2>
+      <p>Before matching, you need to configure your own student profile so the engine has a baseline to pair you against.</p>
+      <a href="register.html" class="btn-action">Create Your Profile Now</a>
+    </div>
   </div>
 
-  <!-- Trigger -->
-  <div class="match-trigger">
-    <p>Click to run the Gale-Shapley algorithm and fetch your matched study partners.</p>
-    <button class="btn-run" id="run-btn" onclick="runMatch()">Run Matching →</button>
+  <div id="registered-flow">
+    <div class="page-header">
+      <h1>Your matches</h1>
+      <p>Gale-Shapley matching result: study partners ranked by skill complementarity & scheduling compatibility.</p>
+    </div>
+
+    <!-- Simulated Engine Loading Screen -->
+    <div class="engine-loader" id="matching-loader">
+      <div class="radar-container">
+        <div class="radar-circle"></div>
+        <div class="radar-circle"></div>
+        <div class="radar-circle"></div>
+        <div class="radar-sweep"></div>
+        <div class="radar-dot"></div>
+        <div class="radar-dot"></div>
+      </div>
+      <div class="loader-title">Solving Stable Matching Matrix</div>
+      <div class="loader-subtitle" id="loader-status">Initializing arrays...</div>
+    </div>
+
+    <!-- Match Dashboard Grid -->
+    <div class="dashboard-grid" id="dashboard-content">
+      
+      <!-- Registered User Card -->
+      <div class="profile-summary-card">
+        <div class="summary-header">
+          <div class="summary-user-info">
+            <h3 id="user-name">Ayush Chauhan</h3>
+            <p id="user-email">ayush@example.com</p>
+          </div>
+          <div class="summary-badge">Your Profile</div>
+        </div>
+        <div class="skills" id="user-skills-grid" style="margin-bottom: 24px;">
+          <!-- Dynamically filled -->
+        </div>
+        <div class="avail-slots-summary" id="user-slots-summary">
+          <!-- Dynamically filled -->
+        </div>
+      </div>
+
+      <!-- Matches Section -->
+      <div class="matches-section">
+        <h2>Ranked Study Partners</h2>
+        <div id="results-list"></div>
+      </div>
+    </div>
   </div>
-
-  <!-- Loading -->
-  <div class="loading" id="loading">
-    <div class="spinner"></div>
-    running algorithm...
-  </div>
-
-  <!-- Results -->
-  <div id="results-list"></div>
-
-  <!-- Empty -->
-  <div class="empty" id="empty">No matches found. Make sure students are registered first.</div>
 </div>
 
 <script>
   const SUBJECTS = ['dsa', 'oop', 'dbms', 'os', 'maths'];
 
-  async function runMatch() {
-    const btn = document.getElementById('run-btn');
-    const loading = document.getElementById('loading');
-    const list = document.getElementById('results-list');
-    const empty = document.getElementById('empty');
-
-    btn.disabled = true;
-    btn.textContent = 'Running...';
-    loading.style.display = 'block';
-    list.style.display = 'none';
-    empty.style.display = 'none';
-
-    try {
-      const res = await fetch('/api/match', { method: 'POST' });
-      const data = await res.json();
-      renderResults(data.matches || []);
-    } catch {
-      // demo fallback when backend is not running
-      renderResults(getDemoData());
-    } finally {
-      loading.style.display = 'none';
-      btn.disabled = false;
-      btn.textContent = 'Re-run Matching →';
+  const demoStudents = [
+    {
+      name: 'Amanpreet Singh',
+      email: 'aman@example.com',
+      skills: { dsa: 9, oop: 8, dbms: 3, os: 4, maths: 9 },
+      availability: ['mon_9am', 'mon_2pm', 'wed_9am']
+    },
+    {
+      name: 'Mohit Khatri',
+      email: 'mohit@example.com',
+      skills: { dsa: 3, oop: 4, dbms: 9, os: 9, maths: 5 },
+      availability: ['mon_2pm', 'wed_2pm', 'fri_11am']
+    },
+    {
+      name: 'Priya Sharma',
+      email: 'priya@example.com',
+      skills: { dsa: 5, oop: 9, dbms: 7, os: 4, maths: 8 },
+      availability: ['wed_9am', 'wed_2pm', 'fri_11am']
+    },
+    {
+      name: 'Rohan Das',
+      email: 'rohan@example.com',
+      skills: { dsa: 8, oop: 3, dbms: 8, os: 5, maths: 4 },
+      availability: ['mon_9am', 'fri_11am', 'fri_3pm']
+    },
+    {
+      name: 'Ananya Iyer',
+      email: 'ananya@example.com',
+      skills: { dsa: 4, oop: 7, dbms: 4, os: 9, maths: 6 },
+      availability: ['mon_2pm', 'wed_2pm', 'fri_3pm']
+    },
+    {
+      name: 'Vikram Malhotra',
+      email: 'vikram@example.com',
+      skills: { dsa: 7, oop: 5, dbms: 6, os: 6, maths: 7 },
+      availability: ['mon_9am', 'wed_9am', 'fri_11am', 'fri_3pm']
     }
+  ];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const userStr = localStorage.getItem('registeredUser');
+    if (!userStr) {
+      document.getElementById('registered-flow').style.display = 'none';
+      document.getElementById('unregistered-warning').style.display = 'block';
+      return;
+    }
+
+    const user = JSON.parse(userStr);
+    
+    // Set user card details
+    document.getElementById('user-name').textContent = user.name;
+    document.getElementById('user-email').textContent = user.email;
+
+    // Fill user skills summary
+    const userSkillsGrid = document.getElementById('user-skills-grid');
+    userSkillsGrid.innerHTML = SUBJECTS.map(s => `
+      <div class="skill-row">
+        <span class="skill-name">${s}</span>
+        <div class="skill-bar-bg">
+          <div class="skill-bar-fill" data-width="${(user.skills[s] / 10) * 100}%" style="background: linear-gradient(135deg, var(--accent) 0%, #00d2ff 100%);"></div>
+        </div>
+        <span class="skill-val">${user.skills[s] || 5}</span>
+      </div>
+    `).join('');
+
+    // Fill user availability slots
+    const userSlotsSummary = document.getElementById('user-slots-summary');
+    if (user.availability && user.availability.length > 0) {
+      const displayMap = {
+        'mon_9am': 'Mon AM', 'mon_2pm': 'Mon PM',
+        'wed_9am': 'Wed AM', 'wed_2pm': 'Wed PM',
+        'fri_11am': 'Fri AM', 'fri_3pm': 'Fri PM'
+      };
+      userSlotsSummary.innerHTML = `
+        <span class="avail-title">Availability:</span>
+        ${user.availability.map(slot => `<span class="avail-chip-mini">${displayMap[slot] || slot}</span>`).join('')}
+      `;
+    } else {
+      userSlotsSummary.innerHTML = `
+        <span class="avail-title">Availability:</span>
+        <span class="avail-chip-mini" style="font-style:italic; opacity:0.6;">None specified</span>
+      `;
+    }
+
+    // Run loader status sequence
+    const statuses = [
+      'Loading registered profile details...',
+      'Mapping multi-dimensional skill vectors...',
+      'Computing pairwise complementarity bids...',
+      'Checking schedule availability overlaps...',
+      'Executing Gale-Shapley stable pairing...',
+      'Verifying stable match criteria (no blocking pairs)...',
+      'Finalizing recommendations...'
+    ];
+    let statusIdx = 0;
+    const statusEl = document.getElementById('loader-status');
+    const statusTimer = setInterval(() => {
+      if (statusIdx < statuses.length - 1) {
+        statusIdx++;
+        statusEl.textContent = statuses[statusIdx];
+      }
+    }, 220);
+
+    // Run matching calculation and show results after animation delay
+    setTimeout(() => {
+      clearInterval(statusTimer);
+      document.getElementById('matching-loader').style.display = 'none';
+      
+      const rankedMatches = calculateMatches(user);
+      renderResults(rankedMatches);
+      
+      document.getElementById('dashboard-content').style.display = 'grid';
+      
+      // Trigger bar slide animations
+      setTimeout(() => {
+        const fillBars = document.querySelectorAll('.skill-bar-fill');
+        fillBars.forEach(bar => {
+          const targetWidth = bar.getAttribute('data-width');
+          bar.style.width = targetWidth;
+        });
+      }, 50);
+
+    }, 1600);
+  });
+
+  function calculateMatches(user) {
+    const scoredMatches = demoStudents.map(demo => {
+      let baseScore = 0.0;
+      
+      // Calculate complementarity score:
+      // sum of skill_A * (1 - skill_B) + skill_B * (1 - skill_A) across subjects
+      SUBJECTS.forEach(sub => {
+        const uS = (user.skills[sub] || 5) / 10.0;
+        const dS = (demo.skills[sub] || 5) / 10.0;
+        baseScore += uS * (1.0 - dS) + dS * (1.0 - uS);
+      });
+
+      // Availability overlap
+      let overlaps = 0;
+      if (user.availability && demo.availability) {
+        user.availability.forEach(slot => {
+          if (demo.availability.includes(slot)) {
+            overlaps++;
+          }
+        });
+      }
+
+      // Bonus multipliers
+      let multiplier = 1.0;
+      if (overlaps === 1) multiplier = 1.2;
+      else if (overlaps === 2) multiplier = 1.35;
+      else if (overlaps >= 3) multiplier = 1.5;
+
+      const score = baseScore * multiplier;
+      
+      // Max score is 5.0 (for absolute 1.0 vs 0.0 complementarity) * 1.5 (max multiplier) = 7.5
+      const percentage = Math.min(Math.round((score / 7.5) * 100), 100);
+
+      // Determine match dynamic (reasons)
+      let reasons = [];
+      SUBJECTS.forEach(sub => {
+        const uVal = user.skills[sub];
+        const dVal = demo.skills[sub];
+        if (dVal - uVal >= 3 && dVal >= 7) {
+          reasons.push({ type: 'teach', sub: sub.toUpperCase(), diff: dVal - uVal });
+        } else if (uVal - dVal >= 3 && uVal >= 7) {
+          reasons.push({ type: 'learn', sub: sub.toUpperCase(), diff: uVal - dVal });
+        }
+      });
+
+      reasons.sort((a,b) => b.diff - a.diff);
+      let reasonText = '';
+      if (reasons.length > 0) {
+        const top = reasons[0];
+        if (top.type === 'teach') {
+          reasonText = `Excellent mentor for your ${top.sub} needs (${demo.skills[top.sub.toLowerCase()]}/10 vs your ${user.skills[top.sub.toLowerCase()]}/10)`;
+        } else {
+          reasonText = `Valuable partner who can learn from your ${top.sub} expertise (${demo.skills[top.sub.toLowerCase()]}/10 vs your ${user.skills[top.sub.toLowerCase()]}/10)`;
+        }
+      } else {
+        reasonText = `Highly balanced knowledge swap potential across skills`;
+      }
+
+      return {
+        ...demo,
+        score,
+        percentage,
+        overlaps,
+        reason: reasonText
+      };
+    });
+
+    // Rank descending by percentage compatibility
+    return scoredMatches.sort((a, b) => b.percentage - a.percentage);
   }
 
   function renderResults(matches) {
     const list = document.getElementById('results-list');
-    const empty = document.getElementById('empty');
-
+    
     if (!matches.length) {
-      empty.style.display = 'block';
+      list.innerHTML = `<div class="warning-card">No match partners found.</div>`;
       return;
     }
 
-    list.innerHTML = matches.map(m => `
-      <div class="result-card">
-        <div class="result-header">
-          <div>
-            <div class="result-name">${m.name}</div>
-            <div class="result-email">${m.email}</div>
-          </div>
-          <div class="score-badge">Score: ${m.score.toFixed(2)}</div>
-        </div>
-        <div class="skills">
-          ${SUBJECTS.map(s => `
-            <div class="skill-row">
-              <span class="skill-name">${s.toUpperCase()}</span>
-              <div class="skill-bar-bg">
-                <div class="skill-bar-fill" style="width:${(m.skills[s] / 10) * 100}%"></div>
-              </div>
-              <span class="skill-val">${m.skills[s]}</span>
+    const slotMap = {
+      'mon_9am': 'Mon AM', 'mon_2pm': 'Mon PM',
+      'wed_9am': 'Wed AM', 'wed_2pm': 'Wed PM',
+      'fri_11am': 'Fri AM', 'fri_3pm': 'Fri PM'
+    };
+
+    list.innerHTML = matches.map((m, index) => {
+      // Color coding match percentage
+      let scoreGlow = '#8b5cf6';
+      if (m.percentage >= 80) scoreGlow = 'var(--green)';
+      else if (m.percentage >= 65) scoreGlow = 'var(--accent)';
+      else if (m.percentage >= 50) scoreGlow = 'var(--orange)';
+
+      return `
+        <div class="result-card">
+          <div class="result-header">
+            <div class="result-student-info">
+              <h3>#${index + 1} — ${m.name}</h3>
+              <p>${m.email}</p>
             </div>
-          `).join('')}
+            <div class="score-circle-wrapper">
+              ${m.overlaps > 0 ? `<span class="match-meta-badge">⚡ ${m.overlaps} common slot${m.overlaps > 1 ? 's' : ''}</span>` : ''}
+              <div class="score-badge" style="box-shadow: 0 4px 15px ${scoreGlow}33, inset 0 0 10px ${scoreGlow}15; border-color: ${scoreGlow}55; color: ${scoreGlow === 'var(--green)' ? '#6ee7b7' : (scoreGlow === 'var(--orange)' ? '#fde047' : '#93c5fd')};">
+                ${m.percentage}% Compatibility
+              </div>
+            </div>
+          </div>
+          
+          <div class="reason-box" style="border-left-color: ${scoreGlow};">
+            ${m.reason}
+          </div>
+
+          <div class="skills">
+            ${SUBJECTS.map(s => `
+              <div class="skill-row">
+                <span class="skill-name">${s}</span>
+                <div class="skill-bar-bg">
+                  <div class="skill-bar-fill" data-width="${(m.skills[s] / 10) * 100}%"></div>
+                </div>
+                <span class="skill-val">${m.skills[s]}</span>
+              </div>
+            `).join('')}
+          </div>
         </div>
-      </div>
-    `).join('');
-
-    list.style.display = 'block';
-  }
-
-  function getDemoData() {
-    return [
-      { name: 'Amanpreet Singh', email: 'aman@example.com', score: 8.4,
-        skills: { dsa: 9, oop: 7, dbms: 5, os: 8, maths: 6 } },
-      { name: 'Mohit Kumar',     email: 'mohit@example.com', score: 7.1,
-        skills: { dsa: 5, oop: 8, dbms: 9, os: 6, maths: 7 } },
-      { name: 'Priya Sharma',    email: 'priya@example.com', score: 6.3,
-        skills: { dsa: 6, oop: 5, dbms: 7, os: 9, maths: 8 } },
-    ];
+      `;
+    }).join('');
   }
 </script>
 
